@@ -1,6 +1,22 @@
+# 기본은 전부 무시하고, 아래 허용 목록만 올라감 (제품 원본·문서·.env 차단)
 *
 !.gitignore
 !README.md
+!PAUSE
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
+!publisher_ci/
+!publisher_ci/*.py
 !posts/
 !posts/**/
 !posts/**/*.jpg
+!queue/
+!queue/**/
+!queue/**/*.json
+!state/
+!state/**/
+!state/**/*.claimed
+!state/**/*.done
+!results/
+!results/*.jsonl

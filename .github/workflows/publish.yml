@@ -1,0 +1,27 @@
+name: publish-queue
+# KST 15:00~23:45 사이 15분마다 실행 (UTC 06:00~14:45). 예약 시간이 지난 게시물만 올림.
+on:
+  schedule:
+    - cron: "*/15 6-14 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-queue      # 동시에 두 번 실행되지 않게 (중복 게시 방지)
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Publish due posts
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_ENABLED: ${{ vars.THREADS_ENABLED }}
+        run: python publisher_ci/publish_queue.py
