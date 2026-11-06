@@ -1,0 +1,22 @@
+name: threads-token-refresh
+# 매주 일요일 KST 10:00 (UTC 01:00). 쓰레드 토큰(60일)을 새로 받아 Secret 을 덮어씀.
+on:
+  schedule:
+    - cron: "0 1 * * 0"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh Threads token
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.SECRETS_PAT }}
+        run: python publisher_ci/threads_refresh.py
