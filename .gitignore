@@ -1,0 +1,6 @@
+*
+!.gitignore
+!README.md
+!posts/
+!posts/**/
+!posts/**/*.jpg
