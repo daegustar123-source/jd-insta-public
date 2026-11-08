@@ -1,8 +1,8 @@
 name: publish-queue
-# KST 15:00~23:45 사이 15분마다 실행 (UTC 06:00~14:45). 예약 시간이 지난 게시물만 올림.
+# KST 09:00~23:45 사이 15분마다 실행 (UTC 00:00~14:45). 예약 시간이 지난 게시물만 올림. (게시 09:30·12:00·17:00·20:00)
 on:
   schedule:
-    - cron: "*/15 6-14 * * *"
+    - cron: "*/15 0-14 * * *"
   workflow_dispatch:
 permissions:
   contents: write
