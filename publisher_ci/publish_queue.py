@@ -101,7 +101,14 @@ def th_publish(item, urls):
     if not token or not text:
         return None
     me = 'me'
-    if item['kind'] == 'carousel' and len(urls) > 1:
+    # 쓰레드 이미지 (2026-11-09): 예약 정보에 threads_images가 있으면 그것만 쓴다(없으면 [] = 글만). 9:16 스토리 이미지는 올리지 않는다.
+    if item.get('threads_images') is not None:
+        urls = [REPO_RAW + p for p in item['threads_images']]
+    elif item['kind'] == 'story':
+        urls = []
+    if not urls:
+        c = api('POST', f'{THREADS}/{me}/threads', {'media_type': 'TEXT', 'text': text}, token)
+    elif len(urls) > 1:
         kids = [api('POST', f'{THREADS}/{me}/threads', {'media_type': 'IMAGE', 'image_url': u, 'is_carousel_item': 'true'}, token)['id'] for u in urls[:10]]
         time.sleep(10)
         c = api('POST', f'{THREADS}/{me}/threads', {'media_type': 'CAROUSEL', 'children': ','.join(kids), 'text': text}, token)
