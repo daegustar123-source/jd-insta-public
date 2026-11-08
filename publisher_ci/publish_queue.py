@@ -113,6 +113,18 @@ def th_publish(item, urls):
     return pub['id'], link
 
 
+def th_reply(item, parent_id):
+    """게시 직후 같은 계정으로 자기 댓글(답글) 1개. 실패해도 본 게시물에는 영향 없음."""
+    token = os.environ.get('THREADS_ACCESS_TOKEN')
+    text = (item.get('threads_reply') or '').strip()
+    if not token or not text:
+        return None
+    c = api('POST', f'{THREADS}/me/threads', {'media_type': 'TEXT', 'text': text, 'reply_to_id': parent_id}, token)
+    time.sleep(10)
+    pub = api('POST', f'{THREADS}/me/threads_publish', {'creation_id': c['id']}, token)
+    return pub['id']
+
+
 def main():
     if os.path.exists('PAUSE'):
         say('PAUSE 파일이 있어 게시를 건너뜁니다.'); return
@@ -172,10 +184,12 @@ def main():
         if not ok:
             record({'slot': slot, 'platform': 'instagram', 'status': 'failed', 'note': '재시도 후 실패, 다음 회차로'})
         if ok and threads_on and item.get('threads_text'):
+            th_id = None
             for attempt in (1, 2):
                 try:
                     r = th_publish(item, urls)
                     if r:
+                        th_id = r[0]
                         record({'slot': slot, 'platform': 'threads', 'status': 'success', 'media_id': r[0], 'permalink': r[1]})
                         say('쓰레드 게시 성공', slot, r[1])
                     break
@@ -183,6 +197,17 @@ def main():
                     record({'slot': slot, 'platform': 'threads', 'status': 'error', 'attempt': attempt, 'error': mask(e)})
                     if attempt == 1:
                         time.sleep(45)
+            if th_id and item.get('threads_reply'):  # 자기 댓글 (본 게시물 재시도와 분리 - 중복 게시 방지)
+                for attempt in (1, 2):
+                    try:
+                        rid = th_reply(item, th_id)
+                        record({'slot': slot, 'platform': 'threads_reply', 'status': 'success', 'media_id': rid, 'reply_to': th_id})
+                        say('쓰레드 자기 댓글 성공', slot)
+                        break
+                    except Exception as e:
+                        record({'slot': slot, 'platform': 'threads_reply', 'status': 'error', 'attempt': attempt, 'error': mask(e)})
+                        if attempt == 1:
+                            time.sleep(20)
         open(done, 'w').write('success' if ok else 'failed')
         commit_push([done, rfile], f'{"post" if ok else "fail"} {day} {slot}')
 
