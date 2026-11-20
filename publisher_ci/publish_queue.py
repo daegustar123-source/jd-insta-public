@@ -161,7 +161,8 @@ def main():
         when = dt.datetime.fromisoformat(item['scheduled_kst'])
         if now < when:
             continue
-        if len([f for f in os.listdir(sdir) if f.endswith('.done')]) >= DAILY_LIMIT:
+        base_done = [f for f in os.listdir(sdir) if f.endswith('.done') and f[:-5] in ('feed1', 'story', 'carousel', 'feed2')]
+        if not item.get('extra') and len(base_done) >= DAILY_LIMIT:  # 다시 올리기(extra)는 하루 4개 제한에 세지 않음
             record({'slot': slot, 'platform': 'instagram', 'status': 'skipped', 'reason': f'하루 {DAILY_LIMIT}개 제한'})
             open(done, 'w').write('limit'); commit_push([done, rfile], f'skip {day} {slot} (limit)'); continue
         if now - when > dt.timedelta(hours=LATE_LIMIT_H):

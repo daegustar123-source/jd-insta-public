@@ -1,8 +1,10 @@
 name: publish-queue
-# KST 09:00~23:45 사이 15분마다 실행 (UTC 00:00~14:45). 예약 시간이 지난 게시물만 올림. (게시 09:30·12:00·17:00·20:00)
+# PC가 게시 시간에 직접 실행(workflow_dispatch). 예약 시간이 지난 게시물만 올림.
 on:
-  schedule:
-    - cron: "*/15 0-14 * * *"
+  # 2026-11-20: 15분 예약 실행 끔. PC 작업 스케줄러(publish_slot.py)가 게시 시간에 직접 실행함.
+  # 되돌리려면 아래 두 줄의 주석을 푼다.
+  # schedule:
+  #   - cron: "*/15 0-14 * * *"
   workflow_dispatch:
 permissions:
   contents: write
