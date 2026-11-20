@@ -1,0 +1,15 @@
+{
+ "date": "2026-11-21",
+ "slot": "carousel",
+ "kind": "carousel",
+ "scheduled_kst": "2026-11-21T00:46:00+09:00",
+ "images": [
+  "posts/2026-11-21/carousel_1.jpg",
+  "posts/2026-11-21/carousel_2.jpg"
+ ],
+ "caption": "캡션",
+ "threads_text": "",
+ "threads_reply": "",
+ "threads_images": [],
+ "label": "엑셀 · 캐러셀"
+}
